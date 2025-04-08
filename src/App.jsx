@@ -13,17 +13,19 @@ const App = () => {
   const addPerson = (event) => {
 
     event.preventDefault()
+
+    const personExist = persons.some((person) => person.name === newName)
+    if (personExist) {
+      alert(newName + ' This person already exists in the form ')
+     return 
+    }
     const personObject = {
       name: newName
     }
 
     setPersons(persons.concat(personObject))
     setNewName('')
-    const personExist = persons.some((person) => person.name === newName)
-    if (personExist) {
-      alert(newName + ' This person already exists in the form ')
-      
-    }
+    
   }
 
   return (
