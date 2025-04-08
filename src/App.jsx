@@ -11,6 +11,7 @@ const App = () => {
   }
 
   const addPerson = (event) => {
+
     event.preventDefault()
     const personObject = {
       name: newName
@@ -18,6 +19,11 @@ const App = () => {
 
     setPersons(persons.concat(personObject))
     setNewName('')
+    const personExist = persons.some((person) => person.name === newName)
+    if (personExist) {
+      alert(newName + ' This person already exists in the form ')
+      
+    }
   }
 
   return (
@@ -33,11 +39,11 @@ const App = () => {
       </form>
       <h2>Numbers</h2>
       <ul>
-        {persons.map((person,keyToname) => (
+        {persons.map((person, keyToname) => (
           <li key={keyToname}>
             <h3>{person.name}</h3>
           </li>
-          
+
         ))}
       </ul>
     </div>
