@@ -7,7 +7,10 @@ const Part = (props) => (
     {props.part.name} {props.part.exercises}
   </p>
 )
-const Footer = (props) => <h2>{props.message}</h2>
+
+const Footer = (props) => <h3>{props.message}</h3>
+
+const Total = (props) => <p>Number of exercises {props.total}</p>
 
 const Content = ({ parts }) => {
   return (
@@ -18,19 +21,24 @@ const Content = ({ parts }) => {
     </div>
   )
 }
+
 const Course = ({ course }) => {
+  const total = course.parts.reduce((sum, part) => sum + part.exercises, 0)
+
   return (
     <div>
       <Header course={course.name} />
       <Content parts={course.parts} />
+      <Total total={total} />
       <Footer message={course.text} />
     </div>
   )
 }
+
 const App = () => {
   const course = {
     id: 1,
-    text: "hi i'm Carlos Mario Quintero I use full Stack open i be so happy to understand more to develope",
+    text: "Hi, I'm Carlos Mario Quintero. I use Full Stack Open and I'm happy to understand more to develop.",
     name: 'Half Stack application development',
     parts: [
       {
@@ -46,8 +54,7 @@ const App = () => {
       {
         name: 'State of a component',
         exercises: 14,
-        id: 3,
-
+        id: 3
       }
     ]
   }
