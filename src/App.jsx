@@ -1,4 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import axios from 'axios'
+import Note from './components/Note'
+
 const Filter = ({ filterText, filterPerson }) => (
   <form>
     <div>
@@ -6,8 +9,8 @@ const Filter = ({ filterText, filterPerson }) => (
     </div>
   </form>
 )
-const PersonForm =({newName,newNumber,handlepersonChange,handleNoteChange,handleSubmit})=>(
-<form onSubmit={handleSubmit}>
+const PersonForm = ({ newName, newNumber, handlepersonChange, handleNoteChange, handleSubmit }) => (
+  <form onSubmit={handleSubmit}>
     <div>
       name: <input value={newName} onChange={handleNoteChange} />
     </div>
@@ -21,7 +24,7 @@ const PersonForm =({newName,newNumber,handlepersonChange,handleNoteChange,handle
 )
 const Persons = ({ persons }) => (
   <ul>
-    {persons.map((person,keyPerson) => (
+    {persons.map((person, keyPerson) => (
       <li key={keyPerson}>
         <h3>{person.name} {person.number}</h3>
       </li>
@@ -30,6 +33,18 @@ const Persons = ({ persons }) => (
 )
 
 const App = () => {
+  useEffect(() => {
+    axios
+      .get('http://localhost:3001/persons')
+      .then(response => {
+        setPersons(response.data)
+      })
+      .catch(error => {
+        console.error("error fetching data:", error)
+      })
+  }, [])
+  
+
   const [persons, setPersons] = useState([
     {
       name: 'Arto Hellas',
@@ -46,8 +61,8 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
   const [filterText, setFilter] = useState('')
   const handlepersonChange = (event) => setNewNumber(event.target.value)
-  const handleNoteChange = (event) =>setNewName(event.target.value)
-  const filterPerson = (event) =>setFilter(event.target.value)
+  const handleNoteChange = (event) => setNewName(event.target.value)
+  const filterPerson = (event) => setFilter(event.target.value)
 
   const addPerson = (event) => {
 
