@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import Note from './components/Note'
+import noteService from './services/notes'
 
 const Filter = ({ filterText, filterPerson }) => (
   <form>
@@ -9,6 +10,7 @@ const Filter = ({ filterText, filterPerson }) => (
     </div>
   </form>
 )
+
 const PersonForm = ({ newName, newNumber, handlepersonChange, handleNoteChange, handleSubmit }) => (
   <form onSubmit={handleSubmit}>
     <div>
@@ -22,6 +24,7 @@ const PersonForm = ({ newName, newNumber, handlepersonChange, handleNoteChange, 
     </div>
   </form>
 )
+
 const Persons = ({ persons }) => (
   <ul>
     {persons.map((person, keyPerson) => (
@@ -33,17 +36,54 @@ const Persons = ({ persons }) => (
 )
 
 const App = () => {
+  const [notes, setNotes] = useState([])
+  const [newNote, setNewNote] = useState('')
+  const [showAll, setShowAll] = useState(true)
+
   useEffect(() => {
-    axios
-      .get('http://localhost:3001/persons')
-      .then(response => {
-        setPersons(response.data)
-      })
-      .catch(error => {
-        console.error("error fetching data:", error)
+    noteService
+      .getAll()
+      .then(initialNotes => {
+        setNotes(initialNotes)
       })
   }, [])
-  
+
+  const toggleImportanceOf = id => {
+    const note = notes.find(n => n.id === id)
+    const changedNote = { ...note, important: !note.important }
+
+    noteService
+      .update(id, changedNote).then(returnedNote => {
+        setNotes(notes.map(note => note.id !== id ? note : returnedNote))
+      })
+      .catch(error => {
+        alert(
+          `Esta nota: '${note.content}' ya se ha borrado del servidor`
+        )
+        setNotes(notes.filter(n => n.id !== id))
+      })
+  }
+ 
+  const addNote = (event) => {
+    event.preventDefault()
+    const noteObject = {
+      content: newNote,
+      important: Math.random() > 0.5
+    }
+
+    noteService
+      .create(noteObject)
+      .then(returnedNote => {
+        setNotes(notes.concat(returnedNote))
+        setNewNote('')
+      })
+  }
+
+  const handleNoteChange = (event) => {
+    setNewNote(event.target.value)
+  }
+
+  const notesToShow = showAll ? notes : notes.filter((note) => note.important)
 
   const [persons, setPersons] = useState([
     {
@@ -60,12 +100,12 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filterText, setFilter] = useState('')
+
   const handlepersonChange = (event) => setNewNumber(event.target.value)
-  const handleNoteChange = (event) => setNewName(event.target.value)
+  const handleNameChange = (event) => setNewName(event.target.value)
   const filterPerson = (event) => setFilter(event.target.value)
 
   const addPerson = (event) => {
-
     event.preventDefault()
 
     const personExist = persons.some((person) => person.name === newName)
@@ -73,31 +113,51 @@ const App = () => {
       alert(newName + ' This person already exists in the form ')
       return
     }
+
     const personObject = {
       name: newName,
-      number: newNumber
+      number: newNumber,
+      id: persons.length + 1
     }
-
+    axios.post("http://localhost:3001/persons",personObject).then(response=>{
+      console.log(response)
+    })
     setPersons(persons.concat(personObject))
     setNewName('')
     setNewNumber('')
+  } 
 
-  }
   const personsToShow = filterText.length > 0
     ? persons.filter(person => person.name.toLowerCase().includes(filterText.toLowerCase()))
     : persons
 
   return (
     <div>
+      <h1>Notes</h1>
+      <div>
+        <button onClick={() => setShowAll(!showAll)}>
+          show {showAll ? 'important' : 'all'}
+        </button>
+      </div>
+      <ul>
+        {notesToShow.map((note, i) =>
+          <Note
+            key={i}
+            note={note}
+            toggleImportance={() => toggleImportanceOf(note.id)}
+          />
+        )}
+      </ul>
+
       <h2>Phonebook</h2>
       <Filter filterText={filterText} filterPerson={filterPerson} />
       <h2>Add New</h2>
       <PersonForm
         newName={newName}
         newNumber={newNumber}
-        handleNoteChange={handleNoteChange}//metodo que use ,incorrecto por que es dificil de entender, como fue nombrado,solo que me guie de el ejemplo dado en esta parte B del curso se usa para agregar el nombre
-        handlepersonChange={handlepersonChange}//metodo que use ,incorrecto por que es dificil de entender, como fue nombrado,solo que me guie de el ejemplo dado en esta parte B del curso se usa para agregar el numero
-        handleSubmit={addPerson}//SUBMIT que creo se deberia usar normalmente en un form
+        handleNoteChange={handleNameChange}
+        handlepersonChange={handlepersonChange}
+        handleSubmit={addPerson}
       />
       <h2>Numbers</h2>
       <Persons persons={personsToShow} />
