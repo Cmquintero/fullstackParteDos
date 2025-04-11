@@ -25,11 +25,14 @@ const PersonForm = ({ newName, newNumber, handlepersonChange, handleNoteChange, 
   </form>
 )
 
-const Persons = ({ persons }) => (
+const Persons = ({ persons, onDelete }) => (
   <ul>
-    {persons.map((person, keyPerson) => (
-      <li key={keyPerson}>
-        <h3>{person.name} {person.number}</h3>
+    {persons.map((person) => (
+      <li key={person.id}>
+        <h3>
+          {person.name} {person.number}
+          <button onClick={() => onDelete(person.id)}>Delete</button>
+        </h3>
       </li>
     ))}
   </ul>
@@ -137,6 +140,22 @@ const App = () => {
     })
     
   }
+  const deletePerson = (id) => {
+    const person = persons.find(persona => persona.id === id)
+    const confirmDelete = window.confirm(`do you want delete this person in the form? ${person.name}?`)
+    
+    if (confirmDelete) {
+      noteService
+        .Delete(id)
+        .then(() => {
+          setPersons(persons.filter(persona => persona.id !== id))
+        })
+        .catch(error => {
+          alert(`The person '${person.name}' The person always delete`)
+          setPersons(persons.filter(persona => persona.id !== id)) 
+        })
+    }
+  }
 
   const personsToShow = filterText.length > 0
     ? persons.filter(person => person.name.toLowerCase().includes(filterText.toLowerCase()))
@@ -171,7 +190,7 @@ const App = () => {
         handleSubmit={addPerson}
       />
       <h2>Numbers</h2>
-      <Persons persons={personsToShow} />
+      <Persons persons={personsToShow} onDelete={deletePerson} />
     </div>
   )
 }
