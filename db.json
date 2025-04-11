@@ -3,29 +3,20 @@
     {
       "name": "Arto Hellas",
       "number": "040-123456",
-      "id": "1"
+      "id": "1",
+      "important": false
     },
     {
       "name": "Ada Lovelace",
       "number": "39-44-5323523",
-      "id": "2"
+      "id": "2",
+      "important": true
     },
     {
       "name": "Dan Abramov",
       "number": "12-43-234345",
       "id": "3",
       "important": true
-    },
-    {
-      "name": "Carlos Mario",
-      "number": "3157960454",
-      "id": "4",
-      "important": true
-    },
-    {
-      "id": 3,
-      "name": "Helsinsky Stack",
-      "number": "12554-155-505"
     }
   ]
 }

@@ -39,7 +39,6 @@ const App = () => {
   const [notes, setNotes] = useState([])
   const [newNote, setNewNote] = useState('')
   const [showAll, setShowAll] = useState(true)
-
   useEffect(() => {
     noteService
       .getAll()
@@ -63,7 +62,18 @@ const App = () => {
         setNotes(notes.filter(n => n.id !== id))
       })
   }
- 
+  const hook = () => {
+    noteService
+      .getAll()
+      .then(initialPerson => {
+        setPersons(initialPerson)
+        setFilter(initialPerson)
+      })
+      .catch((error)=>{
+        console.error("Error in get",error)
+      })
+  }
+
   const addNote = (event) => {
     event.preventDefault()
     const noteObject = {
@@ -117,15 +127,16 @@ const App = () => {
     const personObject = {
       name: newName,
       number: newNumber,
-      id: persons.length + 1
+      id: persons.length +1 + 1 //Es Algo extraño pero en la creacion del id no me daba como queria y no me habia fijado en que contaba el arreglo desde 0 y el id desde 1 por eso decidi crear el +1+1 para que asi el id no de un numero incorrecto
     }
-    axios.post("http://localhost:3001/persons",personObject).then(response=>{
-      console.log(response)
-    })
-    setPersons(persons.concat(personObject))
+    noteService.create( personObject).then(personBack => {
+      console.log(personBack)
+    setPersons(persons.concat(personBack))
     setNewName('')
     setNewNumber('')
-  } 
+    })
+    
+  }
 
   const personsToShow = filterText.length > 0
     ? persons.filter(person => person.name.toLowerCase().includes(filterText.toLowerCase()))
