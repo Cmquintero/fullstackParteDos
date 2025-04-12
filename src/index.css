@@ -29,4 +29,14 @@ button{
     padding: 5px;
     margin-bottom: 5px;
    max-width: max-content;
-  }
+}
+.message{
+    color: rgb(37, 175, 9);
+    background: lightgrey;
+    font-size: 20px;
+    border-style: solid;
+    border-radius: 5px;
+    padding: 5px;
+    margin-bottom: 5px;
+   max-width: max-content;
+}
