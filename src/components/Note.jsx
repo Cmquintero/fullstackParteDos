@@ -3,11 +3,10 @@ const Note = ({ note, toggleImportance }) => {
     ? 'make not important' : 'make important'
 
   return (
-    <li>
-      {note.content} 
+    <li className='note'>
+      {note.content}
       <button onClick={toggleImportance}>{label}</button>
     </li>
   )
 }
-  export default Note
-  
+export default Note

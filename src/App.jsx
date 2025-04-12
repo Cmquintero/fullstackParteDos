@@ -3,6 +3,32 @@ import axios from 'axios'
 import Note from './components/Note'
 import noteService from './services/notes'
 
+const Footer = () => {
+  const footerStyle = {
+    color: "blue",
+    fontStyle: 'italic',
+    fontSize: 20
+  }
+  return (
+    <div style={footerStyle}>
+      <br />
+      <p>Note app, Department of Computer Science, University of Helsinki 2024</p>
+    </div>
+  )
+}
+
+const Notification = ({ message }) => {
+  
+  if (message === null) {
+    return null
+  }
+
+  return (
+    <div className="error">
+      {message}
+    </div>
+  )
+}
 const Filter = ({ filterText, filterPerson }) => (
   <form>
     <div>
@@ -30,18 +56,21 @@ const Persons = ({ persons, onDelete }) => (
     {persons.map((person) => (
       <li key={person.id}>
         <h3>
-          {person.name} {person.number}
-          <button onClick={() => onDelete(person.id)}>Delete</button>
+          {person.name } : { person.number } ¿
+          <button onClick={() => onDelete (person.id)}> Delete</button>?
         </h3>
       </li>
     ))}
   </ul>
 )
 
+
 const App = () => {
   const [notes, setNotes] = useState([])
   const [newNote, setNewNote] = useState('')
   const [showAll, setShowAll] = useState(true)
+  const [errorMessage, setErrorMessage] = useState('You have a error papabello...')
+  
   useEffect(() => {
     noteService
       .getAll()
@@ -58,13 +87,14 @@ const App = () => {
       .update(id, changedNote).then(returnedNote => {
         setNotes(notes.map(note => note.id !== id ? note : returnedNote))
       })
-      .catch(error => {
-        alert(
-          `Esta nota: '${note.content}' ya se ha borrado del servidor`
-        )
+      .catch(error => {setErrorMessage(`Note '${note.content}' was already removed from server`)
+        setTimeout(() => {
+          setErrorMessage(null)
+        }, 5000)
         setNotes(notes.filter(n => n.id !== id))
       })
   }
+  
   const hook = () => {
     noteService
       .getAll()
@@ -121,12 +151,37 @@ const App = () => {
   const addPerson = (event) => {
     event.preventDefault()
 
-    const personExist = persons.some((person) => person.name === newName)
-    if (personExist) {
+    const personExist = persons.find((person) => person.name === newName)
+    /*if (personExist) {
       alert(newName + ' This person already exists in the form ')
       return
-    }
-
+    }*/
+    if (personExist) {
+      const confirmUpdate = window.confirm(
+        `${newName} this person exist in the form, replace the old number with a new number?`
+      )
+    
+    if (confirmUpdate) {
+      const updatedPerson = { ...personExist, number: newNumber }
+      noteService
+      .update(personExist.id, updatedPerson)
+      .then(returnedPerson => {
+        setPersons(persons.map(person => 
+          person.id !== personExist.id ? person : returnedPerson
+        ))
+        setNewName('')
+        setNewNumber('')
+        setErrorMessage(`Updated ${returnedPerson.name}'s number`)
+        setTimeout(() => setErrorMessage(null), 5000)
+      })
+      .catch(error => {
+        setErrorMessage(`Information of ${personExist.name} has already been removed from server`)
+        setTimeout(() => setErrorMessage(null), 5000)
+        setPersons(persons.filter(p => p.id !== personExist.id))
+      })
+  }
+  return
+}
     const personObject = {
       name: newName,
       number: newNumber,
@@ -137,6 +192,8 @@ const App = () => {
     setPersons(persons.concat(personBack))
     setNewName('')
     setNewNumber('')
+    setErrorMessage(`Added ${personBack.name}`)
+    setTimeout(() => setErrorMessage(null), 5000)
     })
     
   }
@@ -164,6 +221,7 @@ const App = () => {
   return (
     <div>
       <h1>Notes</h1>
+      <Notification message={errorMessage} />
       <div>
         <button onClick={() => setShowAll(!showAll)}>
           show {showAll ? 'important' : 'all'}
@@ -190,7 +248,8 @@ const App = () => {
         handleSubmit={addPerson}
       />
       <h2>Numbers</h2>
-      <Persons persons={personsToShow} onDelete={deletePerson} />
+      <Persons persons={ personsToShow } onDelete={ deletePerson } />
+      <Footer />
     </div>
   )
 }

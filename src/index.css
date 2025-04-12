@@ -1,0 +1,32 @@
+h1 {
+    color: blue;
+    font-style: italic;
+    font-weight: lighter;
+}
+
+body {
+    background-color: rgb(228, 200, 195);
+}
+
+.note{
+    color: skyblue;
+    padding-top: 1px;
+}
+li{
+    color: blue;
+    font-style: italic;
+}
+button{
+    font-style: italic;
+    background-color: blueviolet;
+}
+.error {
+    color: red;
+    background: lightgrey;
+    font-size: 20px;
+    border-style: solid;
+    border-radius: 5px;
+    padding: 5px;
+    margin-bottom: 5px;
+   max-width: max-content;
+  }
