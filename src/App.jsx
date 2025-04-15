@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import Note from './components/Note'
 import noteService from './services/notes'
+import axios from 'axios'
 
 const Footer = () => {
   const footerStyle = {
@@ -84,6 +85,8 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
   const [filterText, setFilter] = useState('')
   const [succesMessage, setSuccesMessage] = useState('Vas a agregar una persona?')
+  const [countries, setCountries] = useState([])
+  const [searchItem, setSearchItem] = useState("")
 
 
 
@@ -92,7 +95,7 @@ const App = () => {
       setPersons(initialPersons)
     })
   }, [])
-  
+
   const toggleImportanceOf = id => {
     const note = notes.find(n => n.id === id)
     const changedNote = { ...note, important: !note.important }
@@ -135,9 +138,9 @@ const App = () => {
     setTimeout(() => {
       setSuccesMessage("")
     }, 5000)
-    
+
     const personExist = persons.find((person) => person.name === newName)
-    
+
     if (personExist) {
       const confirmUpdate = window.confirm(
         `${newName} this person exist in the form, replace the old number with a new number?`
@@ -182,7 +185,7 @@ const App = () => {
   const deletePerson = (id) => {
     const person = persons.find(persona => persona.id === id)
     const confirmDelete = window.confirm(`Do you want to delete this person in the form? ${person.name}?`)
-    
+
     if (confirmDelete) {
       noteService
         .remove(id)
@@ -203,11 +206,45 @@ const App = () => {
         })
     }
   }
-  
+
   const notesToShow = showAll ? notes : notes.filter(note => note.important)
   const personsToShow = filterText.length > 0
     ? persons.filter(person => person.name.toLowerCase().includes(filterText.toLowerCase()))
     : persons
+
+  useEffect(() => {
+    if (searchItem.trim() === '') {
+      setCountries([])
+      return
+    }
+
+    const searchCountries = async () => {
+      try {
+        const url = `https://restcountries.com/v3.1/name/${searchItem}`
+        const response = await axios.get(url)
+        const data = response.data
+        console.log("Países recibidos:", data)
+        setCountries(data)
+      } catch (error) {
+        console.error("Error fetching:", error.message)
+        setCountries([])
+      }
+    }
+
+    searchCountries()
+  }, [searchItem])
+
+  const findLenguage = (languages) => {
+    if (Array.isArray(languages)) {
+      return languages.join(', ')
+    } else if (typeof languages === 'object') {
+      return Object.values(languages).join(', ')
+    } else {
+      return 'unknow'
+
+    }
+
+  }
 
   return (
     <div>
@@ -242,6 +279,33 @@ const App = () => {
       />
       <h2>Numbers</h2>
       <Persons persons={personsToShow} onDelete={deletePerson} />
+      <h1 >Find country system</h1>
+      <p>find countries:
+        <input type="text" value={searchItem} onChange={(change) => setSearchItem(change.target.value)} placeholder='Enter the country to search' />
+      </p>
+      {countries.length > 10 && (
+        <p>You entered too many matches, Please be more specific.</p>
+      )}
+      {countries.length <= 10 && countries.length > 1 && (
+        <div>
+          <h3>Matchin countries</h3>
+          <ul>
+            {countries.map((country) => (
+              <li key={country.name.common}>{country.name.common}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+      {countries.length === 1 && (
+        <div>
+          <h3>{countries[0].name.common}</h3>
+          <p>Capital:{countries[0].capital}</p>
+          <p>Area:{countries[0].area}</p>
+          <p>Population: {countries[0].population}</p>
+          <p>Lenguage: {countries[0].languages && findLenguage(countries[0].languages)}</p>
+          <img src={countries[0].flags.svg} alt={`Flag of ${countries[0].name.common}`} width="150" />
+        </div>
+      )}
       <Footer />
     </div>
   )
