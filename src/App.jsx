@@ -87,6 +87,7 @@ const App = () => {
   const [succesMessage, setSuccesMessage] = useState('Vas a agregar una persona?')
   const [countries, setCountries] = useState([])
   const [searchItem, setSearchItem] = useState("")
+  const [selectedCountry,setSelectedCountry] =useState("")
 
 
 
@@ -208,9 +209,9 @@ const App = () => {
   }
 
   const notesToShow = showAll ? notes : notes.filter(note => note.important)
-  const personsToShow = filterText.length > 0
-    ? persons.filter(person => person.name.toLowerCase().includes(filterText.toLowerCase()))
-    : persons
+  const personsToShow = filterText.length > 0? persons.filter(person => person.name && person.name.toLowerCase().includes(filterText.toLowerCase())): persons;
+
+
 
   useEffect(() => {
     if (searchItem.trim() === '') {
@@ -245,7 +246,9 @@ const App = () => {
     }
 
   }
-
+const countryButton =(country)=>(
+  setSelectedCountry(country)
+)
   return (
     <div>
       <h1>Notes</h1>
@@ -278,7 +281,7 @@ const App = () => {
         handleSubmit={addPerson}
       />
       <h2>Numbers</h2>
-      <Persons persons={personsToShow} onDelete={deletePerson} />
+      <Persons persons={personsToShow}  onDelete={ deletePerson} />
       <h1 >Find country system</h1>
       <p>find countries:
         <input type="text" value={searchItem} onChange={(change) => setSearchItem(change.target.value)} placeholder='Enter the country to search' />
@@ -291,19 +294,19 @@ const App = () => {
           <h3>Matchin countries</h3>
           <ul>
             {countries.map((country) => (
-              <li key={country.name.common}>{country.name.common}</li>
+              <li key={country.name.common}>{country.name.common} <button onClick={()=>countryButton(country)}>Show Data</button> </li>
             ))}
           </ul>
         </div>
       )}
-      {countries.length === 1 && (
+      {selectedCountry && (
         <div>
-          <h3>{countries[0].name.common}</h3>
-          <p>Capital:{countries[0].capital}</p>
-          <p>Area:{countries[0].area}</p>
-          <p>Population: {countries[0].population}</p>
-          <p>Lenguage: {countries[0].languages && findLenguage(countries[0].languages)}</p>
-          <img src={countries[0].flags.svg} alt={`Flag of ${countries[0].name.common}`} width="150" />
+          <h3>{selectedCountry.name.common}</h3>
+          <p>Capital:{selectedCountry.capital}</p>
+          <p>Area:{selectedCountry.area}</p>
+          <p>Population: {selectedCountry.population}</p>
+          <p>Lenguage: {selectedCountry.languages && findLenguage(selectedCountry.languages)}</p>
+          <img src={selectedCountry.flags.svg} alt={`Flag of ${selectedCountry.name.common}`} width="300" />
         </div>
       )}
       <Footer />
