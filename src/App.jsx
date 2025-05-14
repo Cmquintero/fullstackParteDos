@@ -141,7 +141,7 @@ const App = () => {
     setTimeout(() => {
       setSuccesMessage("")
     }, 5000)
-
+/*
     const personExist = persons.find((person) => person.name === newName)
 
     if (personExist) {
@@ -169,7 +169,7 @@ const App = () => {
           })
       }
       return
-    }
+    }*/
 
     const personObject = {
       name: newName,
