@@ -97,7 +97,7 @@ const App = () => {
     setTimeout(() => {
       setSuccesMessage("")
     }, 5000)
-/*
+
     const personExist = persons.find((person) => person.name === newName)
 
     if (personExist) {
@@ -125,7 +125,7 @@ const App = () => {
           })
       }
       return
-    }*/
+    }
 
     const personObject = {
       name: newName,
@@ -232,7 +232,9 @@ const App = () => {
   return (
     <div>
       <h1>Phonebook</h1>
-      <Notification message={errorMessage} succesMessage={succesMessage} />
+      <Notification 
+      message={errorMessage} 
+      succesMessage={succesMessage} />
 
       <Filter filterText={filterText} filterPerson={filterPerson} />
 
